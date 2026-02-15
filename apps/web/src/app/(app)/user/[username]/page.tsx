@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic';
 import { createServerClient } from '@/lib/supabase-server';
 import { PollCard } from '@/components/poll-card';
+import { FollowButton } from '@/components/follow-button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 
 export default async function UserProfilePage({ params }: { params: Promise<{ username: string }> }) {
@@ -75,21 +75,18 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
           </div>
           <p className="text-muted-foreground">@{profile.username}</p>
           {profile.bio && <p className="mt-2">{profile.bio}</p>}
+          {profile.location && <p className="text-sm text-muted-foreground mt-1">{profile.location}</p>}
           <div className="flex gap-4 mt-3 text-sm">
             <span><strong>{followerCount ?? 0}</strong> followers</span>
             <span><strong>{followingCount ?? 0}</strong> following</span>
             <span><strong>{profile.xp}</strong> XP</span>
           </div>
         </div>
-        {user && user.id !== profile.id && (
-          <form action="/api/follow" method="POST">
-            <input type="hidden" name="targetId" value={profile.id} />
-            <input type="hidden" name="action" value={isFollowing ? 'unfollow' : 'follow'} />
-            <Button variant={isFollowing ? 'outline' : 'default'}>
-              {isFollowing ? 'Following' : 'Follow'}
-            </Button>
-          </form>
-        )}
+        <FollowButton
+          targetId={profile.id}
+          currentUserId={user?.id ?? null}
+          initialIsFollowing={isFollowing}
+        />
       </div>
 
       {achievements && achievements.length > 0 && (

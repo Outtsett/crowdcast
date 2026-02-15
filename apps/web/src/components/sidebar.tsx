@@ -9,8 +9,11 @@ const navItems = [
   { href: '/explore', label: 'Explore', icon: 'E' },
   { href: '/communities', label: 'Communities', icon: 'C' },
   { href: '/create', label: 'Create Poll', icon: '+' },
+  { href: '/marketplace', label: 'Marketplace', icon: 'M' },
   { href: '/notifications', label: 'Notifications', icon: 'N' },
   { href: '/leaderboard', label: 'Leaderboard', icon: 'L' },
+  { href: '/dashboard', label: 'Dashboard', icon: 'D' },
+  { href: '/pricing', label: 'Pricing', icon: '$' },
 ];
 
 export function Sidebar() {
