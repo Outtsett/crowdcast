@@ -6,3 +6,6 @@ dist
 .env*.local
 supabase/.temp/
 *.tsbuildinfo
+.env.supabase
+.playwright-profile/
+scripts/screenshots/
