@@ -9,6 +9,36 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Trophy, Cpu, Clapperboard, Landmark, UtensilsCrossed,
+  Gamepad2, Music, Shirt, FlaskConical, Plane,
+  Activity, GraduationCap, Briefcase, Palette, Laugh,
+  DollarSign, Bitcoin, Building, BriefcaseBusiness,
+  Heart, Users, Baby, PawPrint, Dumbbell,
+  MapPin, Home, CalendarDays,
+  Film, Tv, BookOpen, Sparkles, Headphones,
+  Car, Leaf, Rocket, Clock, Brain,
+  Church, Scale, Megaphone, PenTool, Wrench,
+  MoreHorizontal,
+} from 'lucide-react';
+
+/* ------------------------------------------------------------------ */
+/*  Category \u2192 icon mapping                                            */
+/* ------------------------------------------------------------------ */
+const CATEGORY_ICONS: Record<string, typeof Trophy> = {
+  Sports: Trophy, Technology: Cpu, Entertainment: Clapperboard, Politics: Landmark,
+  Food: UtensilsCrossed, Gaming: Gamepad2, Music: Music, Fashion: Shirt,
+  Science: FlaskConical, Travel: Plane, Health: Activity, Education: GraduationCap,
+  Business: Briefcase, Art: Palette, Humor: Laugh,
+  Finance: DollarSign, Crypto: Bitcoin, 'Real Estate': Building, Careers: BriefcaseBusiness,
+  Relationships: Heart, Family: Users, Parenting: Baby, Pets: PawPrint, Fitness: Dumbbell,
+  Local: MapPin, Neighborhood: Home, Events: CalendarDays,
+  Movies: Film, 'TV Shows': Tv, Books: BookOpen, Anime: Sparkles, Podcasts: Headphones,
+  Automotive: Car, Environment: Leaf, Space: Rocket, History: Clock, Philosophy: Brain,
+  Religion: Church, Law: Scale, Marketing: Megaphone, Design: PenTool, DIY: Wrench,
+  Other: MoreHorizontal,
+};
 
 const POLL_TYPE_LABELS: Record<PollType, string> = {
   multiple_choice: 'Multiple Choice',
@@ -180,13 +210,28 @@ export function PollForm() {
             <Label htmlFor="anonymous">Anonymous voting</Label>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <select id="category"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="">Select category...</option>
-              {CATEGORIES.map((cat) => (<option key={cat} value={cat}>{cat}</option>))}
-            </select>
+            <Label>Category</Label>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((cat) => {
+                const Icon = CATEGORY_ICONS[cat] || MoreHorizontal;
+                const isActive = category === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCategory(isActive ? '' : cat)}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                      isActive
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="closes">Auto-close after</Label>

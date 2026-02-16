@@ -5,6 +5,32 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CATEGORIES } from '@crowdcast/shared';
 import Link from 'next/link';
+import {
+  Trophy, Cpu, Clapperboard, Landmark, UtensilsCrossed,
+  Gamepad2, Music, Shirt, FlaskConical, Plane,
+  Activity, GraduationCap, Briefcase, Palette, Laugh,
+  DollarSign, Bitcoin, Building, BriefcaseBusiness,
+  Heart, Users, Baby, PawPrint, Dumbbell,
+  MapPin, Home, CalendarDays,
+  Film, Tv, BookOpen, Sparkles, Headphones,
+  Car, Leaf, Rocket, Clock, Brain,
+  Church, Scale, Megaphone, PenTool, Wrench,
+  MoreHorizontal,
+} from 'lucide-react';
+
+const CATEGORY_ICONS: Record<string, typeof Trophy> = {
+  Sports: Trophy, Technology: Cpu, Entertainment: Clapperboard, Politics: Landmark,
+  Food: UtensilsCrossed, Gaming: Gamepad2, Music: Music, Fashion: Shirt,
+  Science: FlaskConical, Travel: Plane, Health: Activity, Education: GraduationCap,
+  Business: Briefcase, Art: Palette, Humor: Laugh,
+  Finance: DollarSign, Crypto: Bitcoin, 'Real Estate': Building, Careers: BriefcaseBusiness,
+  Relationships: Heart, Family: Users, Parenting: Baby, Pets: PawPrint, Fitness: Dumbbell,
+  Local: MapPin, Neighborhood: Home, Events: CalendarDays,
+  Movies: Film, 'TV Shows': Tv, Books: BookOpen, Anime: Sparkles, Podcasts: Headphones,
+  Automotive: Car, Environment: Leaf, Space: Rocket, History: Clock, Philosophy: Brain,
+  Religion: Church, Law: Scale, Marketing: Megaphone, Design: PenTool, DIY: Wrench,
+  Other: MoreHorizontal,
+};
 
 export default async function ExplorePage({
   searchParams,
@@ -49,13 +75,24 @@ export default async function ExplorePage({
       </form>
       <div className="flex flex-wrap gap-2">
         <Link href="/explore">
-          <Badge variant={!category ? 'default' : 'secondary'}>All</Badge>
+          <Badge variant={!category ? 'default' : 'outline'} className="gap-1.5 px-3 py-1.5 text-sm cursor-pointer hover:bg-primary/10 transition-colors">
+            All
+          </Badge>
         </Link>
-        {CATEGORIES.map((cat) => (
-          <Link key={cat} href={`/explore?category=${cat}`}>
-            <Badge variant={category === cat ? 'default' : 'secondary'}>{cat}</Badge>
-          </Link>
-        ))}
+        {CATEGORIES.map((cat) => {
+          const Icon = CATEGORY_ICONS[cat] || MoreHorizontal;
+          return (
+            <Link key={cat} href={`/explore?category=${encodeURIComponent(cat)}`}>
+              <Badge
+                variant={category === cat ? 'default' : 'outline'}
+                className="gap-1.5 px-3 py-1.5 text-sm cursor-pointer hover:bg-primary/10 transition-colors"
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {cat}
+              </Badge>
+            </Link>
+          );
+        })}
       </div>
       <div className="space-y-4">
         {polls && polls.length > 0 ? (
