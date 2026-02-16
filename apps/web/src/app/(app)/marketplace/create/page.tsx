@@ -11,7 +11,6 @@ export default async function CreateExchangeListingPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
-      {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Sparkles className="h-5 w-5 text-primary" />
@@ -19,12 +18,11 @@ export default async function CreateExchangeListingPage() {
         </div>
         <h1 className="text-3xl font-bold tracking-tight">Create a Listing</h1>
         <p className="text-muted-foreground mt-2 leading-relaxed">
-          Share your best poll packs, visual themes, community access, or data
-          insights with the Crowdcast community. You keep <strong>85%</strong> of
-          every sale \u2014 payouts monthly via Stripe Connect.
+          Share your best poll packs, community access, or data insights with the
+          Crowdcast community. You keep <strong>85%</strong> of every sale \u2014 payouts
+          monthly via Stripe Connect.
         </p>
       </div>
-
       <ExchangeListingForm userId={user.id} />
     </div>
   );

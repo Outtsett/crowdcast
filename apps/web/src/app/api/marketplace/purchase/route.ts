@@ -1,7 +1,17 @@
 import { createServerClient } from '@/lib/supabase-server';
+import { rateLimit, getRateLimitId, rateLimitHeaders } from '@/lib/rate-limit';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
+  // Rate limit: 10 purchase actions per minute
+  const rl = rateLimit(getRateLimitId(request, 'purchase'), { limit: 10 });
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please slow down.' },
+      { status: 429, headers: rateLimitHeaders(rl) }
+    );
+  }
+
   const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 

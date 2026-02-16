@@ -45,7 +45,6 @@ export function PurchaseButton({ itemId, price, isOwn }: PurchaseButtonProps) {
         return;
       }
 
-      // Refresh the page to show updated "Purchased" state
       router.refresh();
     } catch {
       setError('Something went wrong');
