@@ -11,17 +11,17 @@ export default async function CreatorDashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  // Get user's marketplace items
+  // Get user's exchange listings
   const { data: items } = await supabase
-    .from('marketplace_items')
+    .from('exchange_listings')
     .select('*')
     .eq('creator_id', user.id)
     .order('created_at', { ascending: false });
 
   // Get sales
   const { data: sales } = await supabase
-    .from('marketplace_purchases')
-    .select('*, item:marketplace_items!item_id(name)')
+    .from('exchange_purchases')
+    .select('*, item:exchange_listings!item_id(name)')
     .eq('seller_id', user.id)
     .order('created_at', { ascending: false })
     .limit(20);
