@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { UserMenu } from './user-menu';
+import { ThemeToggle } from './theme-toggle';
 
 export function Navbar() {
   return (
@@ -9,6 +10,7 @@ export function Navbar() {
           Crowdcast
         </Link>
         <div className="flex-1" />
+        <ThemeToggle />
         <UserMenu />
       </div>
     </header>
