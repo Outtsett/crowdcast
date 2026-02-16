@@ -31,9 +31,23 @@ export const POLL_TYPES: PollType[] = [
 ];
 
 export const CATEGORIES = [
+  // Core interest verticals
   'Sports', 'Technology', 'Entertainment', 'Politics', 'Food',
   'Gaming', 'Music', 'Fashion', 'Science', 'Travel',
-  'Health', 'Education', 'Business', 'Art', 'Humor', 'Other',
+  'Health', 'Education', 'Business', 'Art', 'Humor',
+  // Finance & career
+  'Finance', 'Crypto', 'Real Estate', 'Careers',
+  // Lifestyle & social
+  'Relationships', 'Family', 'Parenting', 'Pets', 'Fitness',
+  // Community & local
+  'Local', 'Neighborhood', 'Events',
+  // Culture & media
+  'Movies', 'TV Shows', 'Books', 'Anime', 'Podcasts',
+  // Industry & niche
+  'Automotive', 'Environment', 'Space', 'History', 'Philosophy',
+  'Religion', 'Law', 'Marketing', 'Design', 'DIY',
+  // Catch-all
+  'Other',
 ] as const;
 
 export const FREE_COMMUNITY_LIMIT = 3;
