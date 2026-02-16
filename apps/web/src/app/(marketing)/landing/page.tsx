@@ -6,10 +6,10 @@ import Link from 'next/link';
 const FEATURES = [
   { title: '7 Poll Types', desc: 'Multiple choice, yes/no, rating, image, ranked choice, this-or-that, open-ended', icon: '&#9744;' },
   { title: 'Live Results', desc: 'Watch votes animate in real-time as your community weighs in', icon: '&#9889;' },
-  { title: 'Communities', desc: 'Create topic-based groups. Sports, tech, food — your community, your polls', icon: '&#128101;' },
+  { title: 'Communities', desc: 'Create topic-based groups. Sports, tech, food \u2014 your community, your polls', icon: '&#128101;' },
   { title: 'Gamification', desc: 'Earn XP, level up, unlock badges, compete on leaderboards', icon: '&#127942;' },
-  { title: 'Creator Marketplace', desc: 'Sell poll templates, themes, and community access passes', icon: '&#128176;' },
-  { title: 'Advanced Analytics', desc: 'Demographics, heatmaps, time-series — understand your audience', icon: '&#128200;' },
+  { title: 'Creator Exchange', desc: 'Sell poll packs, style kits, and community access passes', icon: '&#128176;' },
+  { title: 'Advanced Analytics', desc: 'Demographics, heatmaps, time-series \u2014 understand your audience', icon: '&#128200;' },
 ];
 
 const STATS = [
@@ -92,7 +92,7 @@ export default function LandingPage() {
             <div className="text-center">
               <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold mx-auto">3</div>
               <h3 className="font-semibold mt-4">Grow & Earn</h3>
-              <p className="text-sm text-muted-foreground mt-2">Build your audience, sell on the marketplace, unlock premium insights.</p>
+              <p className="text-sm text-muted-foreground mt-2">Build your audience, sell on the exchange, unlock premium insights.</p>
             </div>
           </div>
         </div>
