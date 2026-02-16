@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { PollResults } from './poll-results';
 import { getTimeAgo } from '@/lib/utils';
 import Link from 'next/link';
+import { Lock, Link2, UsersRound } from 'lucide-react';
 
 interface PollCardProps {
   poll: {
@@ -18,9 +19,11 @@ interface PollCardProps {
     type: string;
     status: string;
     is_anonymous: boolean;
+    allow_multiple: boolean;
     total_votes: number;
     total_comments: number;
     category: string | null;
+    visibility?: string;
     closes_at: string | null;
     created_at: string;
     creator: {
@@ -45,12 +48,14 @@ interface PollCardProps {
 
 export function PollCard({ poll, currentUserId, userVoteOptionId, compact }: PollCardProps) {
   const [hasVoted, setHasVoted] = useState(!!userVoteOptionId);
-  const [votedOptionId, setVotedOptionId] = useState(userVoteOptionId);
+  const [votedOptionIds, setVotedOptionIds] = useState<string[]>(userVoteOptionId ? [userVoteOptionId] : []);
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
   const handleVote = async (optionId: string) => {
-    if (hasVoted || !currentUserId || poll.status === 'closed') return;
+    if (!currentUserId || poll.status === 'closed') return;
+    if (!poll.allow_multiple && hasVoted) return;
+    if (poll.allow_multiple && votedOptionIds.includes(optionId)) return;
     setLoading(true);
 
     const { error } = await supabase
@@ -59,7 +64,7 @@ export function PollCard({ poll, currentUserId, userVoteOptionId, compact }: Pol
 
     if (!error) {
       setHasVoted(true);
-      setVotedOptionId(optionId);
+      setVotedOptionIds(prev => [...prev, optionId]);
     }
     setLoading(false);
   };
@@ -88,6 +93,14 @@ export function PollCard({ poll, currentUserId, userVoteOptionId, compact }: Pol
             <p className="text-xs text-muted-foreground">@{poll.creator.username} &middot; {timeAgo}</p>
           </div>
           <div className="flex gap-1 flex-shrink-0">
+            {poll.visibility && poll.visibility !== 'public' && (
+              <Badge variant="outline" className="text-xs gap-1">
+                {poll.visibility === 'private' && <Lock className="h-3 w-3" />}
+                {poll.visibility === 'unlisted' && <Link2 className="h-3 w-3" />}
+                {poll.visibility === 'community' && <UsersRound className="h-3 w-3" />}
+                {poll.visibility.charAt(0).toUpperCase() + poll.visibility.slice(1)}
+              </Badge>
+            )}
             {poll.category && <Badge variant="secondary" className="text-xs">{poll.category}</Badge>}
             {isClosed && <Badge variant="outline" className="text-xs">Closed</Badge>}
           </div>
@@ -100,12 +113,12 @@ export function PollCard({ poll, currentUserId, userVoteOptionId, compact }: Pol
         )}
       </CardHeader>
       <CardContent>
-        {hasVoted || isClosed ? (
+        {(hasVoted && !poll.allow_multiple) || isClosed ? (
           <PollResults
             pollId={poll.id}
             options={poll.options}
-            totalVotes={poll.total_votes + (hasVoted && !userVoteOptionId ? 1 : 0)}
-            userVoteOptionId={votedOptionId}
+            totalVotes={poll.total_votes + (votedOptionIds.length - (userVoteOptionId ? 1 : 0))}
+            userVoteOptionId={votedOptionIds[0] ?? null}
           />
         ) : currentUserId ? (
           <div className="space-y-2">
@@ -114,12 +127,13 @@ export function PollCard({ poll, currentUserId, userVoteOptionId, compact }: Pol
               .map((option) => (
                 <Button
                   key={option.id}
-                  variant="outline"
+                  variant={votedOptionIds.includes(option.id) ? 'default' : 'outline'}
                   className="w-full justify-start h-auto py-3 text-sm"
                   onClick={() => handleVote(option.id)}
-                  disabled={loading}
+                  disabled={loading || votedOptionIds.includes(option.id)}
                 >
                   {option.label}
+                  {votedOptionIds.includes(option.id) && ' \u2713'}
                 </Button>
               ))}
           </div>

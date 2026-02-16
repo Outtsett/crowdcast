@@ -1,5 +1,12 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 30;
+import type { Metadata } from 'next';
 import { createServerClient } from '@/lib/supabase-server';
+
+export const metadata: Metadata = {
+  title: 'Explore Polls',
+  description: 'Discover trending polls across 40+ categories \u2014 Sports, Tech, Finance, Entertainment, and more.',
+  openGraph: { title: 'Explore Polls on Crowdcast', description: 'Discover and vote on trending polls.' },
+};
 import { PollCard } from '@/components/poll-card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +56,7 @@ export default async function ExplorePage({
       options:poll_options(*)
     `)
     .eq('status', 'active')
+    .in('visibility', ['public'])
     .order('trending_score', { ascending: false })
     .limit(30);
 

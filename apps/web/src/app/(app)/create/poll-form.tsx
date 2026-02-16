@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@crowdcast/supabase/client';
 import { createPollSchema, CATEGORIES } from '@crowdcast/shared';
-import type { PollType } from '@crowdcast/shared';
+import type { PollType, PollVisibility } from '@crowdcast/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +20,7 @@ import {
   Film, Tv, BookOpen, Sparkles, Headphones,
   Car, Leaf, Rocket, Clock, Brain,
   Church, Scale, Megaphone, PenTool, Wrench,
-  MoreHorizontal,
+  MoreHorizontal, Globe, Lock, Link2, UsersRound, X,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -40,6 +40,13 @@ const CATEGORY_ICONS: Record<string, typeof Trophy> = {
   Other: MoreHorizontal,
 };
 
+const VISIBILITY_OPTIONS: { value: PollVisibility; label: string; description: string; icon: typeof Globe }[] = [
+  { value: 'public', label: 'Public', description: 'Anyone can see and vote', icon: Globe },
+  { value: 'private', label: 'Private', description: 'Only invited users can see and vote', icon: Lock },
+  { value: 'unlisted', label: 'Unlisted', description: 'Anyone with the link can see and vote', icon: Link2 },
+  { value: 'community', label: 'Community', description: 'Only community members can see and vote', icon: UsersRound },
+];
+
 const POLL_TYPE_LABELS: Record<PollType, string> = {
   multiple_choice: 'Multiple Choice',
   yes_no: 'Yes / No',
@@ -58,10 +65,39 @@ export function PollForm() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [category, setCategory] = useState('');
   const [closesIn, setClosesIn] = useState('');
+  const [visibility, setVisibility] = useState<PollVisibility>('public');
+  const [inviteSearch, setInviteSearch] = useState('');
+  const [invitedUsers, setInvitedUsers] = useState<{ id: string; username: string; display_name: string }[]>([]);
+  const [searchResults, setSearchResults] = useState<{ id: string; username: string; display_name: string }[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+
+  const searchUsers = async (query: string) => {
+    setInviteSearch(query);
+    if (query.length < 2) { setSearchResults([]); return; }
+    setSearchLoading(true);
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, username, display_name')
+      .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+      .not('id', 'in', `(${invitedUsers.map(u => u.id).join(',')})`)
+      .limit(5);
+    setSearchResults(data || []);
+    setSearchLoading(false);
+  };
+
+  const addInvitedUser = (user: { id: string; username: string; display_name: string }) => {
+    setInvitedUsers(prev => [...prev, user]);
+    setInviteSearch('');
+    setSearchResults([]);
+  };
+
+  const removeInvitedUser = (userId: string) => {
+    setInvitedUsers(prev => prev.filter(u => u.id !== userId));
+  };
 
   const addOption = () => {
     if (options.length < 10) setOptions([...options, { label: '' }]);
@@ -106,6 +142,8 @@ export function PollForm() {
         is_anonymous: isAnonymous,
         closes_at,
         category: category || undefined,
+        visibility,
+        invited_user_ids: invitedUsers.map(u => u.id),
       });
 
       const { data: poll, error: pollError } = await supabase
@@ -118,6 +156,7 @@ export function PollForm() {
           is_anonymous: input.is_anonymous,
           closes_at: input.closes_at,
           category: input.category,
+          visibility: input.visibility,
         })
         .select()
         .single();
@@ -136,6 +175,18 @@ export function PollForm() {
         );
 
       if (optionsError) throw optionsError;
+
+      // Create invites for private polls
+      if (input.visibility === 'private' && input.invited_user_ids.length > 0) {
+        await supabase.from('poll_invites').insert(
+          input.invited_user_ids.map((uid) => ({
+            poll_id: poll.id,
+            user_id: uid,
+            invited_by: user.id,
+          }))
+        );
+      }
+
       router.push(`/poll/${poll.id}`);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to create poll';
@@ -200,6 +251,88 @@ export function PollForm() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader><CardTitle>Visibility</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-2">
+            {VISIBILITY_OPTIONS.map(({ value, label, description: desc, icon: Icon }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setVisibility(value)}
+                className={`flex items-start gap-3 rounded-lg border p-3 text-left transition-colors ${
+                  visibility === value
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:bg-accent'
+                }`}
+              >
+                <Icon className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                  visibility === value ? 'text-primary' : 'text-muted-foreground'
+                }`} />
+                <div>
+                  <p className={`text-sm font-medium ${
+                    visibility === value ? 'text-primary' : ''
+                  }`}>{label}</p>
+                  <p className="text-xs text-muted-foreground">{desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {visibility === 'private' && (
+            <div className="space-y-3 pt-2">
+              <Label>Invite Users</Label>
+              <div className="relative">
+                <Input
+                  placeholder="Search by username..."
+                  value={inviteSearch}
+                  onChange={(e) => searchUsers(e.target.value)}
+                />
+                {searchResults.length > 0 && (
+                  <div className="absolute z-10 mt-1 w-full rounded-md border bg-background shadow-lg">
+                    {searchResults.map((user) => (
+                      <button
+                        key={user.id}
+                        type="button"
+                        onClick={() => addInvitedUser(user)}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent transition-colors"
+                      >
+                        <span className="font-medium">{user.display_name || user.username}</span>
+                        <span className="text-muted-foreground">@{user.username}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {searchLoading && (
+                  <p className="absolute mt-1 text-xs text-muted-foreground px-3 py-2">Searching...</p>
+                )}
+              </div>
+              {invitedUsers.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {invitedUsers.map((user) => (
+                    <Badge key={user.id} variant="secondary" className="gap-1 pr-1">
+                      @{user.username}
+                      <button
+                        type="button"
+                        onClick={() => removeInvitedUser(user.id)}
+                        className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              {invitedUsers.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Add users who should have access to this poll.
+                </p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader><CardTitle>Settings</CardTitle></CardHeader>

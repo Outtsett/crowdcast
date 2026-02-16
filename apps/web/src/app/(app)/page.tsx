@@ -22,7 +22,8 @@ export default async function HomePage({
       options:poll_options(*)
     `)
     .eq('status', 'active')
-    .is('community_id', null);
+    .is('community_id', null)
+    .in('visibility', ['public']);
 
   if (tab === 'trending') {
     query = query.order('trending_score', { ascending: false }).limit(20);

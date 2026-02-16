@@ -19,6 +19,8 @@ export const createPollSchema = z.object({
   category: z.string().optional(),
   tags: z.array(z.string().max(30)).max(5).default([]),
   community_id: z.string().uuid().optional(),
+  visibility: z.enum(['public', 'private', 'unlisted', 'community']).default('public'),
+  invited_user_ids: z.array(z.string().uuid()).max(100).default([]),
 });
 
 export const updateProfileSchema = z.object({

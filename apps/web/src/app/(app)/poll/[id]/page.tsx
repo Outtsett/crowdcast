@@ -1,10 +1,42 @@
 export const dynamic = 'force-dynamic';
+import type { Metadata } from 'next';
 import { createServerClient } from '@/lib/supabase-server';
 import { PollCard } from '@/components/poll-card';
 import { Comments } from '@/components/comments';
 import { Reactions } from '@/components/reactions';
+import { PollInviteManager } from './invite-manager';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { notFound } from 'next/navigation';
+import { Lock, Link2, UsersRound, Globe } from 'lucide-react';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createServerClient();
+  const { data: poll } = await supabase
+    .from('polls')
+    .select('question, category, creator:profiles!creator_id(username)')
+    .eq('id', id)
+    .single();
+
+  if (!poll) return { title: 'Poll Not Found' };
+
+  const creator = (poll.creator as any)?.username || 'someone';
+  return {
+    title: poll.question,
+    description: `Vote on "${poll.question}" by @${creator} on Crowdcast${poll.category ? ` \u2014 ${poll.category}` : ''}`,
+    openGraph: {
+      title: poll.question,
+      description: `Cast your vote \u2014 asked by @${creator}`,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: poll.question,
+      description: `Cast your vote \u2014 asked by @${creator}`,
+    },
+  };
+}
 
 export default async function PollPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -23,6 +55,16 @@ export default async function PollPage({ params }: { params: Promise<{ id: strin
   if (!poll) notFound();
 
   const { data: { user } } = await supabase.auth.getUser();
+
+  // Access control for visibility (RLS already handles it, but show friendly message)
+  const isOwner = user?.id === (poll.creator as any)?.id;
+
+  const visibilityInfo = {
+    public: { label: 'Public', icon: 'Globe' },
+    private: { label: 'Private', icon: 'Lock' },
+    unlisted: { label: 'Unlisted', icon: 'Link2' },
+    community: { label: 'Community Only', icon: 'UsersRound' },
+  }[poll.visibility || 'public'] || { label: 'Public', icon: 'Globe' };
 
   let userVoteOptionId: string | null = null;
   if (user) {
@@ -79,6 +121,15 @@ export default async function PollPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
+      {poll.visibility && poll.visibility !== 'public' && (
+        <div className="flex items-center gap-2">
+          {poll.visibility === 'private' && <Lock className="h-4 w-4 text-muted-foreground" />}
+          {poll.visibility === 'unlisted' && <Link2 className="h-4 w-4 text-muted-foreground" />}
+          {poll.visibility === 'community' && <UsersRound className="h-4 w-4 text-muted-foreground" />}
+          <Badge variant="outline" className="text-xs">{visibilityInfo.label} Poll</Badge>
+        </div>
+      )}
+
       <PollCard
         poll={{
           ...poll,
@@ -88,6 +139,11 @@ export default async function PollPage({ params }: { params: Promise<{ id: strin
         currentUserId={user?.id ?? null}
         userVoteOptionId={userVoteOptionId}
       />
+
+      {/* Invite manager for private polls \u2014 only visible to poll owner */}
+      {isOwner && poll.visibility === 'private' && (
+        <PollInviteManager pollId={id} />
+      )}
 
       <Reactions
         pollId={id}

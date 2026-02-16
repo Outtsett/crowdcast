@@ -9,6 +9,10 @@ export type PollType =
 
 export type PollStatus = 'draft' | 'active' | 'closed';
 
+export type PollVisibility = 'public' | 'private' | 'unlisted' | 'community';
+
+export type InviteStatus = 'pending' | 'accepted' | 'declined';
+
 export type CommunityRole = 'admin' | 'moderator' | 'member';
 
 export type ReactionType = 'like' | 'fire' | 'thinking' | 'laugh' | 'surprise';
