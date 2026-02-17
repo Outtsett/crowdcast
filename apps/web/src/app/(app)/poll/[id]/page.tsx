@@ -8,7 +8,8 @@ import { PollInviteManager } from './invite-manager';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { notFound } from 'next/navigation';
-import { Lock, Link2, UsersRound, Globe } from 'lucide-react';
+import { Lock, Link2, UsersRound, Globe as GlobeIcon } from 'lucide-react';
+import { VoteGlobe } from '@/components/vote-globe';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -119,6 +120,19 @@ export default async function PollPage({ params }: { params: Promise<{ id: strin
   });
   topLevel.forEach(c => { c.replies = repliesMap[c.id] || []; });
 
+  // Fetch vote locations for globe
+  const { data: voteLocations } = await supabase
+    .from('poll_vote_locations' as any)
+    .select('*')
+    .eq('poll_id', id);
+
+  const locations = (voteLocations || []).map((v: any) => ({
+    lat: v.lat,
+    lng: v.lng,
+    vote_count: v.vote_count,
+    country_code: v.country_code,
+  }));
+
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       {poll.visibility && poll.visibility !== 'public' && (
@@ -151,6 +165,22 @@ export default async function PollPage({ params }: { params: Promise<{ id: strin
         initialReactions={reactionCounts}
         userReactions={userReactions}
       />
+
+      {/* Vote globe \u2014 shows where votes came from */}
+      {locations.length > 0 && (
+        <>
+          <Separator />
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <GlobeIcon className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">Where votes came from</h2>
+            </div>
+            <div className="flex justify-center">
+              <VoteGlobe locations={locations} width={400} height={400} />
+            </div>
+          </div>
+        </>
+      )}
 
       <Separator />
 

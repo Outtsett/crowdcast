@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@crowdcast/supabase/client';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -50,7 +49,6 @@ export function PollCard({ poll, currentUserId, userVoteOptionId, compact }: Pol
   const [hasVoted, setHasVoted] = useState(!!userVoteOptionId);
   const [votedOptionIds, setVotedOptionIds] = useState<string[]>(userVoteOptionId ? [userVoteOptionId] : []);
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
 
   const handleVote = async (optionId: string) => {
     if (!currentUserId || poll.status === 'closed') return;
@@ -58,13 +56,19 @@ export function PollCard({ poll, currentUserId, userVoteOptionId, compact }: Pol
     if (poll.allow_multiple && votedOptionIds.includes(optionId)) return;
     setLoading(true);
 
-    const { error } = await supabase
-      .from('votes')
-      .insert({ poll_id: poll.id, option_id: optionId, user_id: currentUserId });
+    try {
+      const res = await fetch('/api/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ poll_id: poll.id, option_id: optionId }),
+      });
 
-    if (!error) {
-      setHasVoted(true);
-      setVotedOptionIds(prev => [...prev, optionId]);
+      if (res.ok || res.status === 409) {
+        setHasVoted(true);
+        setVotedOptionIds(prev => [...prev, optionId]);
+      }
+    } catch {
+      // silent fail — poll results will update via realtime
     }
     setLoading(false);
   };

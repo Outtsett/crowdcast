@@ -1,6 +1,12 @@
-export const dynamic = 'force-dynamic';
+import type { Metadata } from 'next';
 import { createServerClient } from '@/lib/supabase-server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+export const metadata: Metadata = {
+  title: 'Pricing',
+  description: 'Free, Pro, Business, and Enterprise plans for Crowdcast. Start free, upgrade when you need more.',
+  openGraph: { title: 'Crowdcast Pricing', description: 'Choose the plan that fits your polling needs.' },
+};
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
@@ -16,9 +22,10 @@ const PLANS = [
       'Unlimited voting',
       'Social feed & discovery',
       'Up to 3 communities',
-      'Basic analytics',
+      'Basic results & vote counts',
       'Voting streaks & badges',
       'Leaderboards',
+      '3D vote globe (view only)',
     ],
     cta: 'Current Plan',
     disabled: true,
@@ -32,14 +39,14 @@ const PLANS = [
     popular: true,
     features: [
       'Everything in Free',
-      'Tournament & branching polls',
-      'Advanced analytics & heatmaps',
+      'Poll scheduling & auto-close',
       'Custom branding on polls',
-      'Poll scheduling',
       'Unlimited communities',
-      'Export results (CSV, PDF)',
+      'Geospatial vote analytics',
+      'Detailed vote breakdowns',
       'Verified badge',
       'Priority trending',
+      'Creator Hub access',
     ],
     cta: 'Upgrade to Pro',
   },
@@ -56,7 +63,6 @@ const PLANS = [
       'REST API access',
       'Advanced moderation',
       'Audience segmentation',
-      'A/B poll testing',
       'Slack & Discord integration',
       'Custom domain',
       'Priority support',
