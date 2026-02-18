@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@crowdcast/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -138,11 +138,10 @@ export function ExchangeListingForm({ userId }: { userId: string }) {
                   key={t.value}
                   type="button"
                   onClick={() => setType(t.value)}
-                  className={`relative rounded-xl border p-4 text-left transition-all ${
-                    isActive
+                  className={`relative rounded-xl border p-4 text-left transition-all ${isActive
                       ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
                       : 'border-border hover:border-primary/30 hover:bg-accent/50'
-                  }`}
+                    }`}
                 >
                   <div className={`inline-flex rounded-lg bg-gradient-to-br ${t.gradient} p-2 mb-2`}>
                     <Icon className={`h-4 w-4 ${t.iconColor}`} />
@@ -176,11 +175,10 @@ export function ExchangeListingForm({ userId }: { userId: string }) {
                   key={aud.value}
                   type="button"
                   onClick={() => setAudienceCategory(aud.value)}
-                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-left text-sm transition-all ${
-                    isActive
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-left text-sm transition-all ${isActive
                       ? 'border-primary bg-primary/5 ring-1 ring-primary/20 font-medium'
                       : 'border-border hover:border-primary/30 hover:bg-accent/50'
-                  }`}
+                    }`}
                 >
                   <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                   {aud.label}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@crowdcast/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getTimeAgo } from '@/lib/utils';

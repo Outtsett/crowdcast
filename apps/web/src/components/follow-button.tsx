@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@crowdcast/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 import { Button } from '@/components/ui/button';
 
 export function FollowButton({

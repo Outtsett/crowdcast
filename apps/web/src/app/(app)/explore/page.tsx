@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 import { PollCard } from '@/components/poll-card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { CATEGORIES } from '@crowdcast/shared';
+import { CATEGORIES } from '@/lib/shared';
 import Link from 'next/link';
 import {
   Trophy, Cpu, Clapperboard, Landmark, UtensilsCrossed,

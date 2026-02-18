@@ -4,8 +4,10 @@ dist
 .turbo
 .env.local
 .env*.local
+.env.supabase
 supabase/.temp/
 *.tsbuildinfo
-.env.supabase
 .playwright-profile/
+.playwright-data/
 scripts/screenshots/
+.vscode/

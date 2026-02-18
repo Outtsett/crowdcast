@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@crowdcast/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 
 interface PollOption {
   id: string;
@@ -81,9 +81,8 @@ export function PollResults({
                 className="absolute inset-0 rounded-lg bg-primary/10 transition-all duration-500 ease-out"
                 style={{ width: `${pct}%` }}
               />
-              <div className={`relative flex items-center justify-between rounded-lg border p-3 ${
-                isUserVote ? 'border-primary ring-1 ring-primary/20' : 'border-border'
-              }`}>
+              <div className={`relative flex items-center justify-between rounded-lg border p-3 ${isUserVote ? 'border-primary ring-1 ring-primary/20' : 'border-border'
+                }`}>
                 <span className="font-medium text-sm">
                   {option.label}
                   {isUserVote && <span className="ml-2 text-xs text-primary font-normal">Your vote</span>}

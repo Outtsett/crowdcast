@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@crowdcast/supabase/client';
-import { createPollSchema, CATEGORIES } from '@crowdcast/shared';
-import type { PollType, PollVisibility } from '@crowdcast/shared';
+import { createClient } from '@/lib/supabase-client';
+import { createPollSchema, CATEGORIES } from '@/lib/shared';
+import type { PollType, PollVisibility } from '@/lib/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -125,8 +125,8 @@ export function PollForm() {
       const finalOptions = type === 'yes_no'
         ? [{ label: 'Yes' }, { label: 'No' }]
         : type === 'open_ended'
-        ? [{ label: 'Response' }]
-        : options;
+          ? [{ label: 'Response' }]
+          : options;
 
       let closes_at: string | undefined;
       if (closesIn) {
@@ -206,9 +206,8 @@ export function PollForm() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {(Object.entries(POLL_TYPE_LABELS) as [PollType, string][]).map(([key, label]) => (
               <button key={key} type="button" onClick={() => setType(key)}
-                className={`rounded-lg border p-3 text-sm text-left transition-colors ${
-                  type === key ? 'border-primary bg-primary/5 font-medium' : 'border-border hover:bg-accent'
-                }`}>{label}</button>
+                className={`rounded-lg border p-3 text-sm text-left transition-colors ${type === key ? 'border-primary bg-primary/5 font-medium' : 'border-border hover:bg-accent'
+                  }`}>{label}</button>
             ))}
           </div>
         </CardContent>
@@ -261,19 +260,16 @@ export function PollForm() {
                 key={value}
                 type="button"
                 onClick={() => setVisibility(value)}
-                className={`flex items-start gap-3 rounded-lg border p-3 text-left transition-colors ${
-                  visibility === value
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:bg-accent'
-                }`}
+                className={`flex items-start gap-3 rounded-lg border p-3 text-left transition-colors ${visibility === value
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:bg-accent'
+                  }`}
               >
-                <Icon className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                  visibility === value ? 'text-primary' : 'text-muted-foreground'
-                }`} />
+                <Icon className={`h-5 w-5 mt-0.5 flex-shrink-0 ${visibility === value ? 'text-primary' : 'text-muted-foreground'
+                  }`} />
                 <div>
-                  <p className={`text-sm font-medium ${
-                    visibility === value ? 'text-primary' : ''
-                  }`}>{label}</p>
+                  <p className={`text-sm font-medium ${visibility === value ? 'text-primary' : ''
+                    }`}>{label}</p>
                   <p className="text-xs text-muted-foreground">{desc}</p>
                 </div>
               </button>
@@ -353,11 +349,10 @@ export function PollForm() {
                     key={cat}
                     type="button"
                     onClick={() => setCategory(isActive ? '' : cat)}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
-                      isActive
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                    }`}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${isActive
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                      }`}
                   >
                     <Icon className="h-3.5 w-3.5" />
                     {cat}
